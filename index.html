@@ -61,7 +61,13 @@
       align-items: center;
       text-align: center;
       font-size: 1.5rem;
-    }
+      }
+    
+      .numberButton {
+        display: flex; /* Added */
+        justify-content: center; /* Added */
+      }
+
 
     .zeroButton {
       width: 100px;
@@ -136,18 +142,12 @@
     }
 
     function handleNumberButtonClick(button) {
-      if (phoneNumber.length < 10) {
-        phoneNumber += button.textContent;
-        phoneNumberDisplay.textContent = phoneNumber;
-      }
+      phoneNumber += button.textContent;
+      phoneNumberDisplay.textContent = phoneNumber;
     }
 
     function handleSubmitButtonClick() {
-      if (phoneNumber.length === 10) {
-        window.location.href = '/user?phone=' + phoneNumber;
-      } else {
-        alert('Please enter a valid 10-digit phone number.');
-      }
+      window.location.href = '/user?phone=' + phoneNumber;
     }
 
     if (clearButton.addEventListener) {
