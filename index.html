@@ -130,27 +130,43 @@
 
     var phoneNumber = '';
 
-    clearButton.addEventListener('click', function() {
+    function handleClearButtonClick() {
       phoneNumber = '';
       phoneNumberDisplay.textContent = phoneNumber;
-    });
+    }
 
-    numberButtons.forEach(function(button) {
-      button.addEventListener('click', function() {
-        if (phoneNumber.length < 10) {
-          phoneNumber += button.textContent;
-          phoneNumberDisplay.textContent = phoneNumber;
-        }
-      });
-    });
+    function handleNumberButtonClick(button) {
+      if (phoneNumber.length < 10) {
+        phoneNumber += button.textContent;
+        phoneNumberDisplay.textContent = phoneNumber;
+      }
+    }
 
-    submitButton.addEventListener('click', function() {
+    function handleSubmitButtonClick() {
       if (phoneNumber.length === 10) {
         window.location.href = '/user?phone=' + phoneNumber;
       } else {
         alert('Please enter a valid 10-digit phone number.');
       }
-    });
+    }
+
+    if (clearButton.addEventListener) {
+      clearButton.addEventListener('click', handleClearButtonClick);
+      numberButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+          handleNumberButtonClick(button);
+        });
+      });
+      submitButton.addEventListener('click', handleSubmitButtonClick);
+    } else if (clearButton.attachEvent) { // For old versions of IE
+      clearButton.attachEvent('onclick', handleClearButtonClick);
+      numberButtons.forEach(function(button) {
+        button.attachEvent('onclick', function() {
+          handleNumberButtonClick(button);
+        });
+      });
+      submitButton.attachEvent('onclick', handleSubmitButtonClick);
+    }
   </script>
 </body>
 </html>
