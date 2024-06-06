@@ -4,99 +4,63 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Page</title>
-  <style>
-    /* Your CSS styles here */
-  </style>
 </head>
 <body>
-  <div id="userPage">
-    <!-- Content will be dynamically generated here -->
+  <div class="container">
+    <div class="content">
+      <h1>Welcome</h1>
+      <div class="user-display">
+        <p id="username-display"></p>
+      </div>
+      <div class="input-name" style="display:none;">
+        <input type="text" id="username-input" placeholder="Enter your name">
+        <button id="save-button">Save</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      var userPage = document.getElementById("userPage");
-      var params = new URLSearchParams(window.location.search);
-      var phoneNumber = params.get("phone");
-      var user = null;
-      var name = "";
-      var points = "";
+    // Your JavaScript code here
+    window.onload = function() {
+      var usernameDisplay = document.getElementById('username-display');
+      var usernameInput = document.getElementById('username-input');
+      var saveButton = document.getElementById('save-button');
+      var queryString = window.location.search;
+      var urlParams = new URLSearchParams(queryString);
+      var phoneNumber = urlParams.get('phone');
 
-      function render() {
-        userPage.innerHTML = "";
-        if (user !== null && typeof user !== "undefined") {
-          var userDiv = document.createElement("div");
-          userDiv.innerHTML = '<h1>Welcome, ' + user.name + '</h1>' +
-            '<p>Points: ' + user.points + '</p>' +
-            '<input type="number" placeholder="Enter new points" value="' + points + '" id="pointsInput">' +
-            '<button onclick="handlePointsSave()">Save Points</button>';
-          userPage.appendChild(userDiv);
+      // Check if user exists in the database
+      function checkUserExists(phoneNumber) {
+        // Simulated database check
+        var userExists = true; // You need to implement the logic to check if the user exists in the database
+        return userExists;
+      }
+
+      // Display user name if user exists, else show input field
+      function displayUserNameOrInput() {
+        if (checkUserExists(phoneNumber)) {
+          var userName = "John Doe"; // Replace with logic to get user's name from the database
+          usernameDisplay.textContent = "Welcome, " + userName;
         } else {
-          var newUserDiv = document.createElement("div");
-          newUserDiv.innerHTML = '<h1>New User</h1>' +
-            '<input type="text" placeholder="Enter your name" value="' + name + '" id="nameInput">' +
-            '<button onclick="handleSave()">Save</button>';
-          userPage.appendChild(newUserDiv);
+          document.querySelector('.input-name').style.display = "block";
         }
-        var exitButton = document.createElement("button");
-        exitButton.textContent = "Exit";
-        exitButton.onclick = function() {
-          window.location.href = "/";
-        };
-        userPage.appendChild(exitButton);
       }
 
-      function fetchData() {
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState === 4 && xhr.status === 200) {
-            var response = JSON.parse(xhr.responseText);
-            if (response.length > 0) {
-              user = response[0];
-              points = user.points;
-            }
-            render();
-          }
-        };
-        xhr.open("GET", "http://localhost:5000/users?phone=" + phoneNumber, true);
-        xhr.send();
-      }
+      // Event listener for Save button
+      saveButton.addEventListener('click', function() {
+        var newName = usernameInput.value;
+        if (newName.trim() !== '') {
+          // Save new user name to the database (not implemented here)
+          usernameDisplay.textContent = "Welcome, " + newName;
+          document.querySelector('.input-name').style.display = "none";
+        } else {
+          alert("Please enter a valid name.");
+        }
+      });
 
-      function handleSave() {
-        name = document.getElementById("nameInput").value;
-        var newUser = { phone: phoneNumber, name: name, points: 0 };
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://localhost:5000/users", true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState === 4 && xhr.status === 200) {
-            var data = JSON.parse(xhr.responseText);
-            user = data;
-            points = user.points;
-            render();
-          }
-        };
-        xhr.send(JSON.stringify(newUser));
-      }
-
-      function handlePointsSave() {
-        points = document.getElementById("pointsInput").value;
-        var xhr = new XMLHttpRequest();
-        xhr.open("PATCH", "http://localhost:5000/users/" + user.id, true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState === 4 && xhr.status === 200) {
-            var data = JSON.parse(xhr.responseText);
-            user = data;
-            points = "";
-            render();
-          }
-        };
-        xhr.send(JSON.stringify({ points: parseInt(points, 10) }));
-      }
-
-      fetchData();
-    });
+      // Call the function to display user name or input field
+      displayUserNameOrInput();
+    }
   </script>
 </body>
 </html>
