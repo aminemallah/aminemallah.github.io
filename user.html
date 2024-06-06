@@ -37,7 +37,7 @@
     // Polyfill for URLSearchParams in IE 8
     (function () {
       if ("URLSearchParams" in window) return;
-
+  
       function URLSearchParams(query) {
         var params = {};
         query.replace(/(?:\?|&)?([^=&]+)=([^&]*)/g, function (_, key, value) {
@@ -45,10 +45,10 @@
         });
         this.get = function (key) { return params[key]; };
       }
-
+  
       window.URLSearchParams = URLSearchParams;
     })();
-
+  
     // Firebase configuration
     var firebaseConfig = {
       apiKey: "AIzaSyBRH_C6xo0LPOQavGXpf105nEdDjsgJ-g0",
@@ -58,11 +58,11 @@
       messagingSenderId: "886789683087",
       appId: "1:886789683087:web:d5ad542747600c3070fdfa"
     };
-
+  
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     var db = firebase.firestore();
-
+  
     window.onload = function() {
       var usernameDisplay = document.getElementById('username-display');
       var pointsDisplay = document.getElementById('points-display');
@@ -74,7 +74,7 @@
       var queryString = window.location.search;
       var urlParams = new URLSearchParams(queryString);
       var phoneNumber = urlParams.get('phone');
-
+  
       // Check if user exists in Firestore
       function checkUserExists(phoneNumber, callback) {
         var userDocRef = db.collection('users').doc(phoneNumber);
@@ -88,7 +88,7 @@
           callback(error, null);
         });
       }
-
+  
       // Display user name if user exists, else show input field
       function displayUserNameOrInput() {
         checkUserExists(phoneNumber, function(error, userData) {
@@ -98,22 +98,22 @@
           }
           if (userData && userData.name) {
             usernameDisplay.textContent = "Welcome, " + userData.name;
-            var inputPurchase = document.querySelectorAll('.input-purchase')[0];
+            var inputPurchase = document.getElementsByClassName('input-purchase')[0];
             inputPurchase.style.display = "block";
-
+  
             updatePointsDisplay(userData.purchases || []);
           } else {
-            document.querySelector('.input-name').style.display = "block";
+            document.getElementsByClassName('input-name')[0].style.display = "block";
           }
         });
       }
-
+  
       // Function to update the points display
       function updatePointsDisplay(purchases) {
-        var totalPoints = purchases.reduce((sum, value) => sum + value, 0);
+        var totalPoints = purchases.reduce(function(sum, value) { return sum + value; }, 0);
         pointsDisplay.textContent = "Points: " + totalPoints;
       }
-
+  
       // Event listener for Save button
       function saveButtonClickHandler() {
         var newName = usernameInput.value;
@@ -123,8 +123,8 @@
             purchases: []
           }).then(function() {
             usernameDisplay.textContent = "Welcome, " + newName;
-            document.querySelector('.input-name').style.display = "none";
-            document.querySelector('.input-purchase').style.display = "block";
+            document.getElementsByClassName('input-name')[0].style.display = "none";
+            document.getElementsByClassName('input-purchase')[0].style.display = "block";
             updatePointsDisplay([]);
           }).catch(function(error) {
             alert("Error saving name: " + error);
@@ -133,7 +133,7 @@
           alert("Please enter a valid name.");
         }
       }
-
+  
       // Event listener for Purchase button
       function purchaseButtonClickHandler() {
         var purchaseAmount = parseInt(purchaseInput.value, 10);
@@ -162,8 +162,7 @@
           alert("Please enter a valid purchase amount.");
         }
       }
-
-
+  
       // Event listener for Reset Points button
       function resetButtonClickHandler() {
         if (confirm("Are you sure you want to reset points?")) {
@@ -172,10 +171,10 @@
             if (doc.exists) {
               var userData = doc.data();
               var purchases = userData.purchases || [];
-
+  
               if (purchases.length > 0) {
                 userDocRef.update({
-                  purchases_archive: firebase.firestore.FieldValue.arrayUnion(...purchases),
+                  purchases_archive: firebase.firestore.FieldValue.arrayUnion.apply(null, purchases),
                   purchases: []
                 }).then(function() {
                   alert("Points reset successfully!");
@@ -190,31 +189,33 @@
           });
         }
       }
-
+  
       // Attach event for Save button click
       if (saveButton.attachEvent) {
         saveButton.attachEvent('onclick', saveButtonClickHandler);
       } else {
         saveButton.addEventListener('click', saveButtonClickHandler);
       }
-
+  
       // Attach event for Purchase button click
       if (purchaseButton.attachEvent) {
         purchaseButton.attachEvent('onclick', purchaseButtonClickHandler);
       } else {
         purchaseButton.addEventListener('click', purchaseButtonClickHandler);
       }
-
+  
       // Attach event for Reset Points button click
       if (resetButton.attachEvent) {
         resetButton.attachEvent('onclick', resetButtonClickHandler);
       } else {
         resetButton.addEventListener('click', resetButtonClickHandler);
       }
-
+  
       // Call the function to display user name or input field
       displayUserNameOrInput();
     }
   </script>
+  
+  
 </body>
 </html>
