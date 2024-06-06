@@ -5,68 +5,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Page</title>
-  <script type="module">
-    // Import the functions you need from the SDKs you need
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyBRH_C6xo0LPOQavGXpf105nEdDjsgJ-g0",
-      authDomain: "credit-d534b.firebaseapp.com",
-      projectId: "credit-d534b",
-      storageBucket: "credit-d534b.appspot.com",
-      messagingSenderId: "886789683087",
-      appId: "1:886789683087:web:d5ad542747600c3070fdfa"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    window.onload = function() {
-      var usernameDisplay = document.getElementById('username-display');
-      var usernameInput = document.getElementById('username-input');
-      var saveButton = document.getElementById('save-button');
-      var queryString = window.location.search;
-      var urlParams = new URLSearchParams(queryString);
-      var phoneNumber = urlParams.get('phone');
-
-      // Check if user exists in Firestore
-      async function checkUserExists(phoneNumber) {
-        const userDoc = await getDoc(doc(db, 'users', phoneNumber));
-        return userDoc.exists() ? userDoc.data().name : null;
-      }
-
-      // Display user name if user exists, else show input field
-      async function displayUserNameOrInput() {
-        const userName = await checkUserExists(phoneNumber);
-        if (userName) {
-          usernameDisplay.textContent = "Welcome, " + userName;
-        } else {
-          document.querySelector('.input-name').style.display = "block";
-        }
-      }
-
-      // Event listener for Save button
-      async function saveButtonClickHandler() {
-        var newName = usernameInput.value;
-        if (newName.trim() !== '') {
-          await setDoc(doc(db, 'users', phoneNumber), { name: newName });
-          usernameDisplay.textContent = "Welcome, " + newName;
-          document.querySelector('.input-name').style.display = "none";
-        } else {
-          alert("Please enter a valid name.");
-        }
-      }
-
-      // Attach event for Save button click
-      saveButton.addEventListener('click', saveButtonClickHandler);
-
-      // Call the function to display user name or input field
-      displayUserNameOrInput();
-    }
-  </script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-firestore.js"></script>
+  <!-- Polyfills for IE8 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.10/es5-shim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.10/es5-sham.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -81,5 +26,101 @@
       </div>
     </div>
   </div>
+
+  <script>
+    // Polyfill for URLSearchParams in IE 8
+    (function () {
+      if ("URLSearchParams" in window) return;
+
+      function URLSearchParams(query) {
+        var params = {};
+        query.replace(/(?:\?|&)?([^=&]+)=([^&]*)/g, function (_, key, value) {
+          params[key] = decodeURIComponent(value.replace(/\+/g, " "));
+        });
+        this.get = function (key) { return params[key]; };
+      }
+
+      window.URLSearchParams = URLSearchParams;
+    })();
+
+    // Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyBRH_C6xo0LPOQavGXpf105nEdDjsgJ-g0",
+      authDomain: "credit-d534b.firebaseapp.com",
+      projectId: "credit-d534b",
+      storageBucket: "credit-d534b.appspot.com",
+      messagingSenderId: "886789683087",
+      appId: "1:886789683087:web:d5ad542747600c3070fdfa"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.firestore();
+
+    window.onload = function() {
+      var usernameDisplay = document.getElementById('username-display');
+      var usernameInput = document.getElementById('username-input');
+      var saveButton = document.getElementById('save-button');
+      var queryString = window.location.search;
+      var urlParams = new URLSearchParams(queryString);
+      var phoneNumber = urlParams.get('phone');
+
+      // Check if user exists in Firestore
+      function checkUserExists(phoneNumber, callback) {
+        var userDocRef = db.collection('users').doc(phoneNumber);
+        userDocRef.get().then(function(doc) {
+          if (doc.exists) {
+            callback(null, doc.data().name);
+          } else {
+            callback(null, null);
+          }
+        }).catch(function(error) {
+          callback(error, null);
+        });
+      }
+
+      // Display user name if user exists, else show input field
+      function displayUserNameOrInput() {
+        checkUserExists(phoneNumber, function(error, userName) {
+          if (error) {
+            alert("Error checking user: " + error);
+            return;
+          }
+          if (userName) {
+            usernameDisplay.textContent = "Welcome, " + userName;
+          } else {
+            document.querySelector('.input-name').style.display = "block";
+          }
+        });
+      }
+
+      // Event listener for Save button
+      function saveButtonClickHandler() {
+        var newName = usernameInput.value;
+        if (newName.trim() !== '') {
+          db.collection('users').doc(phoneNumber).set({
+            name: newName
+          }).then(function() {
+            usernameDisplay.textContent = "Welcome, " + newName;
+            document.querySelector('.input-name').style.display = "none";
+          }).catch(function(error) {
+            alert("Error saving name: " + error);
+          });
+        } else {
+          alert("Please enter a valid name.");
+        }
+      }
+
+      // Attach event for Save button click
+      if (saveButton.attachEvent) {
+        saveButton.attachEvent('onclick', saveButtonClickHandler);
+      } else {
+        saveButton.addEventListener('click', saveButtonClickHandler);
+      }
+
+      // Call the function to display user name or input field
+      displayUserNameOrInput();
+    }
+  </script>
 </body>
 </html>
