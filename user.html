@@ -20,6 +20,7 @@
       <div class="user-display">
         <p id="username-display"></p>
         <p id="points-display">Points: 0</p>
+        <button id="reset-button">Reset Points</button>
       </div>
       <div class="input-name" style="display:none;">
         <input type="text" id="username-input" placeholder="Enter your name">
@@ -69,6 +70,7 @@
       var saveButton = document.getElementById('save-button');
       var purchaseInput = document.getElementById('purchase-input');
       var purchaseButton = document.getElementById('purchase-button');
+      var resetButton = document.getElementById('reset-button');
       var queryString = window.location.search;
       var urlParams = new URLSearchParams(queryString);
       var phoneNumber = urlParams.get('phone');
@@ -135,21 +137,55 @@
         var purchaseAmount = parseInt(purchaseInput.value, 10);
         if (!isNaN(purchaseAmount) && purchaseAmount > 0) {
           var userDocRef = db.collection('users').doc(phoneNumber);
-          userDocRef.update({
-            purchases: firebase.firestore.FieldValue.arrayUnion(purchaseAmount)
-          }).then(function() {
-            alert("Purchase amount saved!");
-            purchaseInput.value = '';
-            userDocRef.get().then(function(doc) {
-              if (doc.exists) {
-                updatePointsDisplay(doc.data().purchases || []);
-              }
-            });
+          userDocRef.get().then(function(doc) {
+            if (doc.exists) {
+              var purchases = doc.data().purchases || [];
+              purchases.push(purchaseAmount); // Push the purchase amount regardless
+              userDocRef.update({
+                purchases: purchases
+              }).then(function() {
+                alert("Purchase amount saved!");
+                purchaseInput.value = '';
+                updatePointsDisplay(purchases);
+              }).catch(function(error) {
+                alert("Error saving purchase amount: " + error);
+              });
+            } else {
+              // Handle case when the document doesn't exist
+            }
           }).catch(function(error) {
-            alert("Error saving purchase amount: " + error);
+            alert("Error getting document: " + error);
           });
         } else {
           alert("Please enter a valid purchase amount.");
+        }
+      }
+
+
+      // Event listener for Reset Points button
+      function resetButtonClickHandler() {
+        if (confirm("Are you sure you want to reset points?")) {
+          var userDocRef = db.collection('users').doc(phoneNumber);
+          userDocRef.get().then(function(doc) {
+            if (doc.exists) {
+              var userData = doc.data();
+              var purchases = userData.purchases || [];
+
+              if (purchases.length > 0) {
+                userDocRef.update({
+                  purchases_archive: firebase.firestore.FieldValue.arrayUnion(...purchases),
+                  purchases: []
+                }).then(function() {
+                  alert("Points reset successfully!");
+                  updatePointsDisplay([]);
+                }).catch(function(error) {
+                  alert("Error resetting points: " + error);
+                });
+              }
+            }
+          }).catch(function(error) {
+            alert("Error fetching user data: " + error);
+          });
         }
       }
 
@@ -165,6 +201,13 @@
         purchaseButton.attachEvent('onclick', purchaseButtonClickHandler);
       } else {
         purchaseButton.addEventListener('click', purchaseButtonClickHandler);
+      }
+
+      // Attach event for Reset Points button click
+      if (resetButton.attachEvent) {
+        resetButton.attachEvent('onclick', resetButtonClickHandler);
+      } else {
+        resetButton.addEventListener('click', resetButtonClickHandler);
       }
 
       // Call the function to display user name or input field
