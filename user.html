@@ -51,6 +51,20 @@
       margin-bottom: 30px;
     }
 
+    #exit-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+
   </style>
 </head>
 <body>
@@ -73,6 +87,7 @@
       </div>
     </div>
   </div>
+  <button id="exit-button" onclick="window.location.href='index.html'">Exit</button>
 
   <script>
     // Polyfill for URLSearchParams in IE 8
