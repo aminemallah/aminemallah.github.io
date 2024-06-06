@@ -19,6 +19,7 @@
       <h1>Welcome</h1>
       <div class="user-display">
         <p id="username-display"></p>
+        <p id="points-display">Points: 0</p>
       </div>
       <div class="input-name" style="display:none;">
         <input type="text" id="username-input" placeholder="Enter your name">
@@ -63,6 +64,7 @@
 
     window.onload = function() {
       var usernameDisplay = document.getElementById('username-display');
+      var pointsDisplay = document.getElementById('points-display');
       var usernameInput = document.getElementById('username-input');
       var saveButton = document.getElementById('save-button');
       var purchaseInput = document.getElementById('purchase-input');
@@ -95,10 +97,17 @@
           if (userData && userData.name) {
             usernameDisplay.textContent = "Welcome, " + userData.name;
             document.querySelector('.input-purchase').style.display = "block";
+            updatePointsDisplay(userData.purchases || []);
           } else {
             document.querySelector('.input-name').style.display = "block";
           }
         });
+      }
+
+      // Function to update the points display
+      function updatePointsDisplay(purchases) {
+        var totalPoints = purchases.reduce((sum, value) => sum + value, 0);
+        pointsDisplay.textContent = "Points: " + totalPoints;
       }
 
       // Event listener for Save button
@@ -112,6 +121,7 @@
             usernameDisplay.textContent = "Welcome, " + newName;
             document.querySelector('.input-name').style.display = "none";
             document.querySelector('.input-purchase').style.display = "block";
+            updatePointsDisplay([]);
           }).catch(function(error) {
             alert("Error saving name: " + error);
           });
@@ -130,6 +140,11 @@
           }).then(function() {
             alert("Purchase amount saved!");
             purchaseInput.value = '';
+            userDocRef.get().then(function(doc) {
+              if (doc.exists) {
+                updatePointsDisplay(doc.data().purchases || []);
+              }
+            });
           }).catch(function(error) {
             alert("Error saving purchase amount: " + error);
           });
