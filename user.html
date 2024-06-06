@@ -15,34 +15,30 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      const userPage = document.getElementById("userPage");
-      const params = new URLSearchParams(window.location.search);
-      const phoneNumber = params.get("phone");
-      let user = null;
-      let name = "";
-      let points = "";
+      var userPage = document.getElementById("userPage");
+      var params = new URLSearchParams(window.location.search);
+      var phoneNumber = params.get("phone");
+      var user = null;
+      var name = "";
+      var points = "";
 
       function render() {
         userPage.innerHTML = "";
-        if (user) {
-          const userDiv = document.createElement("div");
-          userDiv.innerHTML = `
-            <h1>Welcome, ${user.name}</h1>
-            <p>Points: ${user.points}</p>
-            <input type="number" placeholder="Enter new points" value="${points}" id="pointsInput">
-            <button onclick="handlePointsSave()">Save Points</button>
-          `;
+        if (user !== null && typeof user !== "undefined") {
+          var userDiv = document.createElement("div");
+          userDiv.innerHTML = '<h1>Welcome, ' + user.name + '</h1>' +
+            '<p>Points: ' + user.points + '</p>' +
+            '<input type="number" placeholder="Enter new points" value="' + points + '" id="pointsInput">' +
+            '<button onclick="handlePointsSave()">Save Points</button>';
           userPage.appendChild(userDiv);
         } else {
-          const newUserDiv = document.createElement("div");
-          newUserDiv.innerHTML = `
-            <h1>New User</h1>
-            <input type="text" placeholder="Enter your name" value="${name}" id="nameInput">
-            <button onclick="handleSave()">Save</button>
-          `;
+          var newUserDiv = document.createElement("div");
+          newUserDiv.innerHTML = '<h1>New User</h1>' +
+            '<input type="text" placeholder="Enter your name" value="' + name + '" id="nameInput">' +
+            '<button onclick="handleSave()">Save</button>';
           userPage.appendChild(newUserDiv);
         }
-        const exitButton = document.createElement("button");
+        var exitButton = document.createElement("button");
         exitButton.textContent = "Exit";
         exitButton.onclick = function() {
           window.location.href = "/";
@@ -51,10 +47,10 @@
       }
 
       function fetchData() {
-        const xhr = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
           if (xhr.readyState === 4 && xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
+            var response = JSON.parse(xhr.responseText);
             if (response.length > 0) {
               user = response[0];
               points = user.points;
@@ -62,43 +58,41 @@
             render();
           }
         };
-        xhr.open("GET", `http://localhost:5000/users?phone=${phoneNumber}`, true);
+        xhr.open("GET", "http://localhost:5000/users?phone=" + phoneNumber, true);
         xhr.send();
       }
 
       function handleSave() {
         name = document.getElementById("nameInput").value;
-        const newUser = { phone: phoneNumber, name, points: 0 };
-        fetch("http://localhost:5000/users", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(newUser)
-        })
-        .then(response => response.json())
-        .then(data => {
-          user = data;
-          points = user.points;
-          render();
-        });
+        var newUser = { phone: phoneNumber, name: name, points: 0 };
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://localhost:5000/users", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            user = data;
+            points = user.points;
+            render();
+          }
+        };
+        xhr.send(JSON.stringify(newUser));
       }
 
       function handlePointsSave() {
         points = document.getElementById("pointsInput").value;
-        fetch(`http://localhost:5000/users/${user.id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ points: parseInt(points, 10) })
-        })
-        .then(response => response.json())
-        .then(data => {
-          user = data;
-          points = "";
-          render();
-        });
+        var xhr = new XMLHttpRequest();
+        xhr.open("PATCH", "http://localhost:5000/users/" + user.id, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            user = data;
+            points = "";
+            render();
+          }
+        };
+        xhr.send(JSON.stringify({ points: parseInt(points, 10) }));
       }
 
       fetchData();
