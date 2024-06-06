@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Page</title>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"></script>
 </head>
 <body>
   <div class="container">
@@ -36,6 +39,20 @@
       window.URLSearchParams = URLSearchParams;
     })();
 
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBRH_C6xo0LPOQavGXpf105nEdDjsgJ-g0",
+      authDomain: "credit-d534b.firebaseapp.com",
+      projectId: "credit-d534b",
+      storageBucket: "credit-d534b.appspot.com",
+      messagingSenderId: "886789683087",
+      appId: "1:886789683087:web:d5ad542747600c3070fdfa"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore(app);
+
     window.onload = function() {
       var usernameDisplay = document.getElementById('username-display');
       var usernameInput = document.getElementById('username-input');
@@ -44,17 +61,16 @@
       var urlParams = new URLSearchParams(queryString);
       var phoneNumber = urlParams.get('phone');
 
-      // Check if user exists in the database
-      function checkUserExists(phoneNumber) {
-        // Simulated database check
-        var userExists = true; // You need to implement the logic to check if the user exists in the database
-        return userExists;
+      // Check if user exists in Firestore
+      async function checkUserExists(phoneNumber) {
+        const userDoc = await db.collection('users').doc(phoneNumber).get();
+        return userDoc.exists ? userDoc.data().name : null;
       }
 
       // Display user name if user exists, else show input field
-      function displayUserNameOrInput() {
-        if (checkUserExists(phoneNumber)) {
-          var userName = "John Doe"; // Replace with logic to get user's name from the database
+      async function displayUserNameOrInput() {
+        const userName = await checkUserExists(phoneNumber);
+        if (userName) {
           usernameDisplay.textContent = "Welcome, " + userName;
         } else {
           document.querySelector('.input-name').style.display = "block";
@@ -62,10 +78,12 @@
       }
 
       // Event listener for Save button
-      function saveButtonClickHandler() {
+      async function saveButtonClickHandler() {
         var newName = usernameInput.value;
         if (newName.trim() !== '') {
-          // Save new user name to the database (not implemented here)
+          await db.collection('users').doc(phoneNumber).set({
+            name: newName
+          });
           usernameDisplay.textContent = "Welcome, " + newName;
           document.querySelector('.input-name').style.display = "none";
         } else {
@@ -76,6 +94,8 @@
       // Attach event for Save button click for IE 8
       if (saveButton.attachEvent) {
         saveButton.attachEvent('onclick', saveButtonClickHandler);
+      } else {
+        saveButton.addEventListener('click', saveButtonClickHandler);
       }
 
       // Call the function to display user name or input field
