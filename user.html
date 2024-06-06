@@ -5,41 +5,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Page</title>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"></script>
-</head>
-<body>
-  <div class="container">
-    <div class="content">
-      <h1>Welcome</h1>
-      <div class="user-display">
-        <p id="username-display"></p>
-      </div>
-      <div class="input-name" style="display:none;">
-        <input type="text" id="username-input" placeholder="Enter your name">
-        <button id="save-button">Save</button>
-      </div>
-    </div>
-  </div>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  <script>
-    // Polyfill for IE 8 to support URLSearchParams
-    (function () {
-      if ("URLSearchParams" in window) return;
-
-      function URLSearchParams(query) {
-        var params = {};
-        query.replace(/(?:\?|&)?([^=&]+)=([^&]*)/g, function (_, key, value) {
-          params[key] = decodeURIComponent(value.replace(/\+/g, " "));
-        });
-        this.get = function (key) { return params[key]; };
-      }
-
-      window.URLSearchParams = URLSearchParams;
-    })();
-
-    // Firebase configuration
+    // Your web app's Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBRH_C6xo0LPOQavGXpf105nEdDjsgJ-g0",
       authDomain: "credit-d534b.firebaseapp.com",
@@ -50,8 +21,8 @@
     };
 
     // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
     window.onload = function() {
       var usernameDisplay = document.getElementById('username-display');
@@ -63,8 +34,8 @@
 
       // Check if user exists in Firestore
       async function checkUserExists(phoneNumber) {
-        const userDoc = await db.collection('users').doc(phoneNumber).get();
-        return userDoc.exists ? userDoc.data().name : null;
+        const userDoc = await getDoc(doc(db, 'users', phoneNumber));
+        return userDoc.exists() ? userDoc.data().name : null;
       }
 
       // Display user name if user exists, else show input field
@@ -81,9 +52,7 @@
       async function saveButtonClickHandler() {
         var newName = usernameInput.value;
         if (newName.trim() !== '') {
-          await db.collection('users').doc(phoneNumber).set({
-            name: newName
-          });
+          await setDoc(doc(db, 'users', phoneNumber), { name: newName });
           usernameDisplay.textContent = "Welcome, " + newName;
           document.querySelector('.input-name').style.display = "none";
         } else {
@@ -91,16 +60,26 @@
         }
       }
 
-      // Attach event for Save button click for IE 8
-      if (saveButton.attachEvent) {
-        saveButton.attachEvent('onclick', saveButtonClickHandler);
-      } else {
-        saveButton.addEventListener('click', saveButtonClickHandler);
-      }
+      // Attach event for Save button click
+      saveButton.addEventListener('click', saveButtonClickHandler);
 
       // Call the function to display user name or input field
       displayUserNameOrInput();
     }
   </script>
+</head>
+<body>
+  <div class="container">
+    <div class="content">
+      <h1>Welcome</h1>
+      <div class="user-display">
+        <p id="username-display"></p>
+      </div>
+      <div class="input-name" style="display:none;">
+        <input type="text" id="username-input" placeholder="Enter your name">
+        <button id="save-button">Save</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
