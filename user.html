@@ -24,6 +24,10 @@
         <input type="text" id="username-input" placeholder="Enter your name">
         <button id="save-button">Save</button>
       </div>
+      <div class="input-purchase" style="display:none;">
+        <input type="number" id="purchase-input" placeholder="Enter purchase amount">
+        <button id="purchase-button">Submit</button>
+      </div>
     </div>
   </div>
 
@@ -61,6 +65,8 @@
       var usernameDisplay = document.getElementById('username-display');
       var usernameInput = document.getElementById('username-input');
       var saveButton = document.getElementById('save-button');
+      var purchaseInput = document.getElementById('purchase-input');
+      var purchaseButton = document.getElementById('purchase-button');
       var queryString = window.location.search;
       var urlParams = new URLSearchParams(queryString);
       var phoneNumber = urlParams.get('phone');
@@ -70,7 +76,7 @@
         var userDocRef = db.collection('users').doc(phoneNumber);
         userDocRef.get().then(function(doc) {
           if (doc.exists) {
-            callback(null, doc.data().name);
+            callback(null, doc.data());
           } else {
             callback(null, null);
           }
@@ -81,13 +87,14 @@
 
       // Display user name if user exists, else show input field
       function displayUserNameOrInput() {
-        checkUserExists(phoneNumber, function(error, userName) {
+        checkUserExists(phoneNumber, function(error, userData) {
           if (error) {
             alert("Error checking user: " + error);
             return;
           }
-          if (userName) {
-            usernameDisplay.textContent = "Welcome, " + userName;
+          if (userData && userData.name) {
+            usernameDisplay.textContent = "Welcome, " + userData.name;
+            document.querySelector('.input-purchase').style.display = "block";
           } else {
             document.querySelector('.input-name').style.display = "block";
           }
@@ -99,10 +106,12 @@
         var newName = usernameInput.value;
         if (newName.trim() !== '') {
           db.collection('users').doc(phoneNumber).set({
-            name: newName
+            name: newName,
+            purchases: []
           }).then(function() {
             usernameDisplay.textContent = "Welcome, " + newName;
             document.querySelector('.input-name').style.display = "none";
+            document.querySelector('.input-purchase').style.display = "block";
           }).catch(function(error) {
             alert("Error saving name: " + error);
           });
@@ -111,11 +120,36 @@
         }
       }
 
+      // Event listener for Purchase button
+      function purchaseButtonClickHandler() {
+        var purchaseAmount = parseInt(purchaseInput.value, 10);
+        if (!isNaN(purchaseAmount) && purchaseAmount > 0) {
+          var userDocRef = db.collection('users').doc(phoneNumber);
+          userDocRef.update({
+            purchases: firebase.firestore.FieldValue.arrayUnion(purchaseAmount)
+          }).then(function() {
+            alert("Purchase amount saved!");
+            purchaseInput.value = '';
+          }).catch(function(error) {
+            alert("Error saving purchase amount: " + error);
+          });
+        } else {
+          alert("Please enter a valid purchase amount.");
+        }
+      }
+
       // Attach event for Save button click
       if (saveButton.attachEvent) {
         saveButton.attachEvent('onclick', saveButtonClickHandler);
       } else {
         saveButton.addEventListener('click', saveButtonClickHandler);
+      }
+
+      // Attach event for Purchase button click
+      if (purchaseButton.attachEvent) {
+        purchaseButton.attachEvent('onclick', purchaseButtonClickHandler);
+      } else {
+        purchaseButton.addEventListener('click', purchaseButtonClickHandler);
       }
 
       // Call the function to display user name or input field
