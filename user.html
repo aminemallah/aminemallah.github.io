@@ -21,46 +21,46 @@
 
   <script>
     // Your JavaScript code here
-    window.onload = function() {
-      var usernameDisplay = document.getElementById('username-display');
-      var usernameInput = document.getElementById('username-input');
-      var saveButton = document.getElementById('save-button');
-      var queryString = window.location.search;
-      var urlParams = new URLSearchParams(queryString);
-      var phoneNumber = urlParams.get('phone');
+    // window.onload = function() {
+    //   var usernameDisplay = document.getElementById('username-display');
+    //   var usernameInput = document.getElementById('username-input');
+    //   var saveButton = document.getElementById('save-button');
+    //   var queryString = window.location.search;
+    //   var urlParams = new URLSearchParams(queryString);
+    //   var phoneNumber = urlParams.get('phone');
 
-      // Check if user exists in the database
-      function checkUserExists(phoneNumber) {
-        // Simulated database check
-        var userExists = true; // You need to implement the logic to check if the user exists in the database
-        return userExists;
-      }
+    //   // Check if user exists in the database
+    //   function checkUserExists(phoneNumber) {
+    //     // Simulated database check
+    //     var userExists = true; // You need to implement the logic to check if the user exists in the database
+    //     return userExists;
+    //   }
 
-      // Display user name if user exists, else show input field
-      function displayUserNameOrInput() {
-        if (checkUserExists(phoneNumber)) {
-          var userName = "John Doe"; // Replace with logic to get user's name from the database
-          usernameDisplay.textContent = "Welcome, " + userName;
-        } else {
-          document.querySelector('.input-name').style.display = "block";
-        }
-      }
+    //   // Display user name if user exists, else show input field
+    //   function displayUserNameOrInput() {
+    //     if (checkUserExists(phoneNumber)) {
+    //       var userName = "John Doe"; // Replace with logic to get user's name from the database
+    //       usernameDisplay.textContent = "Welcome, " + userName;
+    //     } else {
+    //       document.querySelector('.input-name').style.display = "block";
+    //     }
+    //   }
 
-      // Event listener for Save button
-      saveButton.addEventListener('click', function() {
-        var newName = usernameInput.value;
-        if (newName.trim() !== '') {
-          // Save new user name to the database (not implemented here)
-          usernameDisplay.textContent = "Welcome, " + newName;
-          document.querySelector('.input-name').style.display = "none";
-        } else {
-          alert("Please enter a valid name.");
-        }
-      });
+    //   // Event listener for Save button
+    //   saveButton.addEventListener('click', function() {
+    //     var newName = usernameInput.value;
+    //     if (newName.trim() !== '') {
+    //       // Save new user name to the database (not implemented here)
+    //       usernameDisplay.textContent = "Welcome, " + newName;
+    //       document.querySelector('.input-name').style.display = "none";
+    //     } else {
+    //       alert("Please enter a valid name.");
+    //     }
+    //   });
 
-      // Call the function to display user name or input field
-      displayUserNameOrInput();
-    }
+    //   // Call the function to display user name or input field
+    //   displayUserNameOrInput();
+    // }
   </script>
 </body>
 </html>
