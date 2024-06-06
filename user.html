@@ -98,7 +98,9 @@
           }
           if (userData && userData.name) {
             usernameDisplay.textContent = "Welcome, " + userData.name;
-            document.querySelector('.input-purchase').style.display = "block";
+            var inputPurchase = document.querySelectorAll('.input-purchase')[0];
+            inputPurchase.style.display = "block";
+
             updatePointsDisplay(userData.purchases || []);
           } else {
             document.querySelector('.input-name').style.display = "block";
