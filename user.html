@@ -20,18 +20,22 @@
       height: 100vh;
     }
 
-    #username-input {
+    #username-input, #purchase-input, #deduct-input {
       padding: 20px;
       font-size: 2rem;
       border-radius: 19px;
     }
 
-    #username-input-save-button {
+    #username-input-save-button, #purchase-button, #deduct-button {
       background-color: #64DD17;
       border: none;
       padding: 20px;
       border-radius: 19px;
       font-size: 2rem;
+    }
+
+    #deduct-button {
+      background-color: red;
     }
 
     #username-display {
@@ -42,6 +46,11 @@
       font-size: 3rem;
       color: #FF0266;
     }
+
+    .input-purchase {
+      margin-bottom: 30px;
+    }
+
   </style>
 </head>
 <body>
@@ -54,12 +63,12 @@
         <button id="username-input-save-button">Save</button>
       </div>
       <div class="input-purchase" style="display:none;">
-        <input type="number" id="purchase-input" placeholder="Enter purchase amount">
+        <input type="number" id="purchase-input" placeholder="purchase amount">
         <button id="purchase-button">Purchase +</button>
         <div id="purchase-display"></div>
       </div>
       <div class="input-deduct" style="display:none;">
-        <input type="number" id="deduct-input" placeholder="Enter points to deduct">
+        <input type="number" id="deduct-input" placeholder="points to deduct">
         <button id="deduct-button">Points -</button>
       </div>
     </div>
@@ -142,7 +151,6 @@
   
       // Function to update the points display
       function updatePointsDisplay(points) {
-        console.log(points);
         pointsDisplay.textContent = "Points: " + points;
       }
   
@@ -152,11 +160,14 @@
         if (newName.trim() !== '') {
           db.collection('users').doc(phoneNumber).set({
             name: newName,
-            purchases: []
+            purchases: [],
+            points: 0
           }).then(function() {
             usernameDisplay.textContent = "Welcome, " + newName;
             document.getElementsByClassName('input-name')[0].style.display = "none";
             document.getElementsByClassName('input-purchase')[0].style.display = "block";
+            document.getElementsByClassName('input-deduct')[0].style.display = "block";
+            pointsDisplay.style.display = "block";
             updatePointsDisplay(0);
           }).catch(function(error) {
             alert("Error saving name: " + error);
