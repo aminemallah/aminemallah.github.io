@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keypad</title>
+  <style>
+    /* Your CSS styles here */
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .content {
+      text-align: center;
+    }
+
+    .displayContainer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .displayContainer p {
+      margin: 0 10px 0 0;
+    }
+
+    .phonedisplay {
+      font-size: 2rem;
+    }
+
+    .clear {
+      width: 40px;
+      height: 40px;
+      background-color: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 1rem;
+    }
+
+    .keypad {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: auto;
+      margin-top: 20px;
+      max-width: 350px;
+    }
+
+    .keypad button {
+      width: 100px; 
+      height: 100px;
+      margin: 5px;
+      box-sizing: border-box;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+
+    .zeroButton {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+    }
+
+    .actions {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .submit {
+      width: 80px; 
+      height: 80px;
+      background-color: green;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 1rem;
+    }
+
+    .title {
+      color: #FF0266;
+      font-size: 3rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="content">
+      <h1 class="title">Credit Loyalty</h1>
+      <div class="displayContainer">
+        <p class="phonedisplay"></p>
+        <button class="clear">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 24 24" 
+            width="24" 
+            height="24"
+          >
+            <path fill="currentColor" d="M3 6l3 18h12l3-18H3zm18-2v2H3V4h4l1-1h8l1 1h4z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="keypad">
+        <button class="numberButton">1</button>
+        <button class="numberButton">2</button>
+        <button class="numberButton">3</button>
+        <button class="numberButton">4</button>
+        <button class="numberButton">5</button>
+        <button class="numberButton">6</button>
+        <button class="numberButton">7</button>
+        <button class="numberButton">8</button>
+        <button class="numberButton">9</button>
+        <button class="zeroButton numberButton">0</button>
+      </div>
+      <div class="actions">
+        <button class="submit">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Your JavaScript code here
+    const phoneNumberDisplay = document.querySelector('.phonedisplay');
+    const clearButton = document.querySelector('.clear');
+    const numberButtons = document.querySelectorAll('.numberButton');
+    const submitButton = document.querySelector('.submit');
+
+    let phoneNumber = '';
+
+    clearButton.addEventListener('click', () => {
+      phoneNumber = '';
+      phoneNumberDisplay.textContent = phoneNumber;
+    });
+
+    numberButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        if (phoneNumber.length < 10) {
+          phoneNumber += button.textContent;
+          phoneNumberDisplay.textContent = phoneNumber;
+        }
+      });
+    });
+
+    submitButton.addEventListener('click', () => {
+      if (phoneNumber.length === 10) {
+        window.location.href = `/user?phone=${phoneNumber}`;
+      } else {
+        alert('Please enter a valid 10-digit phone number.');
+      }
+    });
+  </script>
+</body>
+</html>
