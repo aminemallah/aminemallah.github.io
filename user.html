@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Page</title>
+  <style>
+    /* Your CSS styles here */
+  </style>
+</head>
+<body>
+  <div id="userPage">
+    <!-- Content will be dynamically generated here -->
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const userPage = document.getElementById("userPage");
+      const params = new URLSearchParams(window.location.search);
+      const phoneNumber = params.get("phone");
+      let user = null;
+      let name = "";
+      let points = "";
+
+      function render() {
+        userPage.innerHTML = "";
+        if (user) {
+          const userDiv = document.createElement("div");
+          userDiv.innerHTML = `
+            <h1>Welcome, ${user.name}</h1>
+            <p>Points: ${user.points}</p>
+            <input type="number" placeholder="Enter new points" value="${points}" id="pointsInput">
+            <button onclick="handlePointsSave()">Save Points</button>
+          `;
+          userPage.appendChild(userDiv);
+        } else {
+          const newUserDiv = document.createElement("div");
+          newUserDiv.innerHTML = `
+            <h1>New User</h1>
+            <input type="text" placeholder="Enter your name" value="${name}" id="nameInput">
+            <button onclick="handleSave()">Save</button>
+          `;
+          userPage.appendChild(newUserDiv);
+        }
+        const exitButton = document.createElement("button");
+        exitButton.textContent = "Exit";
+        exitButton.onclick = function() {
+          window.location.href = "/";
+        };
+        userPage.appendChild(exitButton);
+      }
+
+      function fetchData() {
+        const xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            if (response.length > 0) {
+              user = response[0];
+              points = user.points;
+            }
+            render();
+          }
+        };
+        xhr.open("GET", `http://localhost:5000/users?phone=${phoneNumber}`, true);
+        xhr.send();
+      }
+
+      function handleSave() {
+        name = document.getElementById("nameInput").value;
+        const newUser = { phone: phoneNumber, name, points: 0 };
+        fetch("http://localhost:5000/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(newUser)
+        })
+        .then(response => response.json())
+        .then(data => {
+          user = data;
+          points = user.points;
+          render();
+        });
+      }
+
+      function handlePointsSave() {
+        points = document.getElementById("pointsInput").value;
+        fetch(`http://localhost:5000/users/${user.id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ points: parseInt(points, 10) })
+        })
+        .then(response => response.json())
+        .then(data => {
+          user = data;
+          points = "";
+          render();
+        });
+      }
+
+      fetchData();
+    });
+  </script>
+</body>
+</html>
