@@ -21,22 +21,6 @@
   </div>
 
   <script>
-    // Polyfill for IE 8 to support EventListener
-    (function () {
-      if (typeof window.CustomEvent === "function") return false;
-
-      function CustomEvent(event, params) {
-        params = params || { bubbles: false, cancelable: false, detail: undefined };
-        var evt = document.createEvent("CustomEvent");
-        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-        return evt;
-      }
-
-      CustomEvent.prototype = window.Event.prototype;
-
-      window.CustomEvent = CustomEvent;
-    })();
-
     // Polyfill for IE 8 to support URLSearchParams
     (function () {
       if ("URLSearchParams" in window) return;
@@ -78,7 +62,7 @@
       }
 
       // Event listener for Save button
-      saveButton.addEventListener('click', function() {
+      function saveButtonClickHandler() {
         var newName = usernameInput.value;
         if (newName.trim() !== '') {
           // Save new user name to the database (not implemented here)
@@ -87,7 +71,12 @@
         } else {
           alert("Please enter a valid name.");
         }
-      });
+      }
+
+      // Attach event for Save button click for IE 8
+      if (saveButton.attachEvent) {
+        saveButton.attachEvent('onclick', saveButtonClickHandler);
+      }
 
       // Call the function to display user name or input field
       displayUserNameOrInput();
