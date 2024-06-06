@@ -98,12 +98,7 @@
       <div class="displayContainer">
         <p class="phonedisplay"></p>
         <button class="clear">
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            viewBox="0 0 24 24" 
-            width="24" 
-            height="24"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
             <path fill="currentColor" d="M3 6l3 18h12l3-18H3zm18-2v2H3V4h4l1-1h8l1 1h4z"/>
           </svg>
         </button>
@@ -128,20 +123,20 @@
 
   <script>
     // Your JavaScript code here
-    const phoneNumberDisplay = document.querySelector('.phonedisplay');
-    const clearButton = document.querySelector('.clear');
-    const numberButtons = document.querySelectorAll('.numberButton');
-    const submitButton = document.querySelector('.submit');
+    var phoneNumberDisplay = document.querySelector('.phonedisplay');
+    var clearButton = document.querySelector('.clear');
+    var numberButtons = document.querySelectorAll('.numberButton');
+    var submitButton = document.querySelector('.submit');
 
-    let phoneNumber = '';
+    var phoneNumber = '';
 
-    clearButton.addEventListener('click', () => {
+    clearButton.addEventListener('click', function() {
       phoneNumber = '';
       phoneNumberDisplay.textContent = phoneNumber;
     });
 
-    numberButtons.forEach(button => {
-      button.addEventListener('click', () => {
+    numberButtons.forEach(function(button) {
+      button.addEventListener('click', function() {
         if (phoneNumber.length < 10) {
           phoneNumber += button.textContent;
           phoneNumberDisplay.textContent = phoneNumber;
@@ -149,9 +144,9 @@
       });
     });
 
-    submitButton.addEventListener('click', () => {
+    submitButton.addEventListener('click', function() {
       if (phoneNumber.length === 10) {
-        window.location.href = `/user?phone=${phoneNumber}`;
+        window.location.href = '/user?phone=' + phoneNumber;
       } else {
         alert('Please enter a valid 10-digit phone number.');
       }
