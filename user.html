@@ -164,7 +164,6 @@
           }
           if (userData && userData.name) {
             usernameDisplay.textContent = "Welcome, " + userData.name;
-            phoneDisplay.textContent = phoneNumber;
             document.getElementsByClassName('input-purchase')[0].style.display = "block";
             document.getElementsByClassName('input-deduct')[0].style.display = "block";
             pointsDisplay.style.display = "block";
@@ -172,6 +171,7 @@
           } else {
             document.getElementsByClassName('input-name')[0].style.display = "block";
           }
+          phoneDisplay.textContent = phoneNumber;
         });
       }
   
