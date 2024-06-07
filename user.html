@@ -40,6 +40,12 @@
 
     #username-display {
       font-size: 4rem;
+      margin: 0;
+    }
+
+    #phone-display {
+      font-size: 2rem;
+      margin: 0;
     }
 
     #points-display {
@@ -70,7 +76,10 @@
 <body>
   <div class="container">
     <div class="content">
-      <p id="username-display">Welcome, Please enter you name:</p>
+      <div id="username-phone-display">
+        <p id="username-display">Welcome, Please enter you name:</p>
+        <p id="phone-display"></p>
+      </div>
       <p id="points-display" style="display:none;">Points: 0</p>
       <div class="input-name" style="display:none;">
         <input type="text" id="username-input" placeholder="Enter your name">
@@ -121,6 +130,7 @@
   
     window.onload = function() {
       var usernameDisplay = document.getElementById('username-display');
+      var phoneDisplay = document.getElementById('phone-display');
       var pointsDisplay = document.getElementById('points-display');
       var usernameInput = document.getElementById('username-input');
       var saveButton = document.getElementById('username-input-save-button');
@@ -154,6 +164,7 @@
           }
           if (userData && userData.name) {
             usernameDisplay.textContent = "Welcome, " + userData.name;
+            phoneDisplay.textContent = phoneNumber;
             document.getElementsByClassName('input-purchase')[0].style.display = "block";
             document.getElementsByClassName('input-deduct')[0].style.display = "block";
             pointsDisplay.style.display = "block";
