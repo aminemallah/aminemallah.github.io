@@ -142,7 +142,13 @@
     }
   
     function handleSubmitButtonClick() {
-      window.location.href = '/user.html?phone=' + phoneNumber;
+      if (phoneNumber.length > 7) {
+        window.location.href = '/user.html?phone=' + phoneNumber;
+      } else {
+          alert("Phone number invalid.");
+      }
+
+      // window.location.href = '/user.html?phone=' + phoneNumber;
     }
   
     if (clearButton.addEventListener) {
