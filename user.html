@@ -194,7 +194,7 @@
   
       // Event listener for Purchase button
       function purchaseButtonClickHandler() {
-        var purchaseAmount = parseInt(purchaseInput.value, 10);
+        var purchaseAmount = parseFloat(purchaseInput.value, 10);
         if (!isNaN(purchaseAmount) && purchaseAmount > 0) {
           addPurchaseToDisplay(purchaseAmount);
           var userDocRef = db.collection('users').doc(phoneNumber);
@@ -202,8 +202,9 @@
             if (doc.exists) {
               var purchases = doc.data().purchases || [];
               purchases.push(purchaseAmount);
-              originalPoints = doc.data().points || 0;
+              originalPoints = parseFloat(doc.data().points) || 0;
               originalPoints += purchaseAmount/20;
+              originalPoints = originalPoints.toFixed(2)
               userDocRef.update({
                 points: originalPoints
               })
@@ -249,8 +250,10 @@
             var index = purchases.indexOf(amount);
             if (index !== -1) {
               purchases.splice(index, 1);
-              var originalPoints = doc.data().points || 0;
+              var originalPoints = parseFloat(doc.data().points) || 0;
               originalPoints -= amount / 20;
+              originalPoints = originalPoints.toFixed(2)
+              console.log(originalPoints)
               userDocRef.update({
                 points: originalPoints,
                 purchases: purchases
@@ -268,14 +271,15 @@
 
       // Function to handle deduction of points
       function deductPoints() {
-        var deductAmount = parseInt(deductInput.value, 10);
+        var deductAmount = parseFloat(deductInput.value, 10);
         if (!isNaN(deductAmount) && deductAmount > 0) {
           var userDocRef = db.collection('users').doc(phoneNumber);
           userDocRef.get().then(function(doc) {
             if (doc.exists) {
-              var originalPoints = doc.data().points || 0;
+              var originalPoints = parseFloat(doc.data().points) || 0;
               var updatedPoints = originalPoints - deductAmount;
               if (updatedPoints >= 0) {
+                updatedPoints = updatedPoints.toFixed(2)
                 userDocRef.update({
                   points: updatedPoints
                 }).then(function() {
