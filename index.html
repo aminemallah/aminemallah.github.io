@@ -132,7 +132,7 @@
     var phoneNumber = '';
   
     function handleClearButtonClick() {
-      phoneNumber = '';
+      phoneNumber = phoneNumberDisplay.textContent.slice(0, -1);
       phoneNumberDisplay.textContent = phoneNumber;
     }
   
